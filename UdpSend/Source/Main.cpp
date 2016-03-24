@@ -27,10 +27,14 @@ int main (int argc, char* argv[])
     char ch;
     bool quit;
     int port;
+    String host;
     
     if(argc > 1) { port = atoi(argv[1]); }
     else { port = TX_PORT; }
-    
+
+    if(argc > 2) { host = argv[2]; }
+    else { host = "localhost"; }
+
     while(!quit) {
         std::cin >> ch;
         if(ch == 'q') {
@@ -41,7 +45,7 @@ int main (int argc, char* argv[])
             scanf("%s",buf);
             
             sock.waitUntilReady(false, TIMEOUT);
-            sock.write("localhost", port, buf, strlen(buf));
+            sock.write(host, port, buf, strlen(buf));
             printf("\n  sent %s ; t: %lld\r\n", buf, Time::currentTimeMillis());
             
             fflush(stdout);
