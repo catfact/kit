@@ -1,2 +1,2 @@
-# kit
-utilities that I keep rewriting (mostly c/c++)
+### kit
+simple utilities that I keep rewriting (mostly c/c++)
