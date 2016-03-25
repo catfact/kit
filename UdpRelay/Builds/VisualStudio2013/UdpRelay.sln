@@ -1,0 +1,19 @@
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2013
+Project("{4528B56F-A228-C4A4-720E-D5AD325B07D6}") = "UdpRelay", "UdpRelay.vcxproj", "{1DE6904B-FAD1-9E81-3600-0ADB9B395722}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1DE6904B-FAD1-9E81-3600-0ADB9B395722}.Debug|Win32.ActiveCfg = Debug|Win32
+		{1DE6904B-FAD1-9E81-3600-0ADB9B395722}.Debug|Win32.Build.0 = Debug|Win32
+		{1DE6904B-FAD1-9E81-3600-0ADB9B395722}.Release|Win32.ActiveCfg = Release|Win32
+		{1DE6904B-FAD1-9E81-3600-0ADB9B395722}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
