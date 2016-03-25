@@ -27,13 +27,13 @@ int main (int argc, char* argv[])
     char ch;
     bool quit;
     int port;
-    String host;
+    String address;
     
     if(argc > 1) { port = atoi(argv[1]); }
     else { port = TX_PORT; }
 
-    if(argc > 2) { host = argv[2]; }
-    else { host = "localhost"; }
+    if(argc > 2) { address = argv[2]; }
+    else { address = "127.0.0.1"; }
 
     while(!quit) {
         std::cin >> ch;
@@ -42,10 +42,11 @@ int main (int argc, char* argv[])
             break;
         }
         if(ch == 's') {
-            scanf("%s",buf);
+//            scanf("%s", buf);
+            fgets(buf, BUFSIZE, stdin);
             
             sock.waitUntilReady(false, TIMEOUT);
-            sock.write(host, port, buf, strlen(buf));
+            sock.write(address, port, buf, strlen(buf));
             printf("\n  sent %s ; t: %lld\r\n", buf, Time::currentTimeMillis());
             
             fflush(stdout);
