@@ -1,0 +1,1 @@
+simple incremental search algorithm
