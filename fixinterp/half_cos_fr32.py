@@ -1,14 +1,14 @@
-# python script to generate 1/4-sine table
+# python script to generate half-cosine interpolation segment
 # values are 32-bit fract (1.31)
 
 from sympy import *
 
-f = open('quarter_sine_fr32_1024.inc', 'w')
+f = open('half_cos_fr32_1024.inc', 'w')
 
 n = 1024
 
 x = symbols('x')
-expr = sin(x / (n-1) * pi / 2)
+expr = (cos(x / (n-1) * pi + pi) + 1) / 2
 
 def eval(i) :
     y = (expr.subs(x, i).evalf() * 0x7fffffff).round(0)
@@ -18,5 +18,8 @@ def eval(i) :
 
 for i in range(0, n) :
     eval(i)
+
+# cheat with an extra entry instead of wrapping
+eval(n-1)
 
 f.close()
