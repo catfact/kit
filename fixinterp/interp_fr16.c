@@ -1,4 +1,4 @@
-//! interpolate 16-bit sign fract with unsigned phase
+//! interpolation of 16-bit sign fract by cosine segment
 
 #include <stdint.h>
 #include <stdio.h>
@@ -15,14 +15,10 @@ int16_t mul_fr16(int16_t a, int16_t b) {
 }
 
 int16_t mix(int16_t a, int16_t b, int16_t bal) {
-  // return (int16_t)((int32_t)a + mul_fr16((int32_t)b - (int32_t)a, bal));
-  //  return mul_fr16(b, bal) + mul_fr16(a, 0x7fff - bal);
   
   //  printf("mix_a: %04x ; mix_b: %04x ; bal: %04x \r\n", a, b, bal);
   return a + mul_fr16(b-a, bal);
 }
-
-// linear interpolation
 
 // cosine segment interpolation
 const int32_t half_cos_tab[TAB_SIZE + 1] = {
@@ -32,21 +28,19 @@ const int32_t half_cos_tab[TAB_SIZE + 1] = {
 int16_t get_cos_mul(uint32_t phase) {
   int idxA = phase >> (PHASE_BITS - TAB_BITS);
   int idxB = (idxA + 1);
-  uint32_t bal = phase & ((1 << (PHASE_BITS-TAB_BITS)) - 1);
   int16_t cos_a = (int16_t)(half_cos_tab[idxA] >> 16);
   int16_t cos_b = (int16_t)(half_cos_tab[idxB] >> 16);
+  uint32_t bal = phase & ((1 << (PHASE_BITS-TAB_BITS)) - 1);
 			     
   //  printf("\r\nidxA: %d ; idxB: %d ; rem: %08X \r\n", idxA, idxB, bal);
   //  printf("cos_a: %08x ; cos_b: %08x \r\n", cos_a, cos_b);
   
   bal >>= (PHASE_BITS - TAB_BITS) - 15;
-  //  printf (" cos bal: %08X \r\n ", bal);
   return mix( cos_a, cos_b, (int16_t)bal );
 }
 
 int16_t interp_cos(int16_t a, int16_t b, uint32_t phase) {
   return mix(a, b, get_cos_mul(phase));
-  //  return get_cos_mul(phase);
 }
 
 /// test
@@ -60,10 +54,10 @@ int main(void) {
   int val;
   int tmp;
   
-  // a "typical" phase increment
+  // a "typical" phase increment (22hz at 44.1k)
   int phi = (int)((float)0xffffffff / 44100.f * 22.f);
 
-  #if 0
+#if 0
   printf(" \r\n a: %08X ; b: %08X ; (b-a): %08X ; phi: %08X \r\n",
 	 a, b, b-a, phi);
   
@@ -72,7 +66,6 @@ int main(void) {
   
   
   while (i < (1 << 14)) {
-      //while(0) {
     val = interp_cos(a, b, phase);
     printf("%d \t %d \r\n", i, val);
     phase0 = phase;
