@@ -1,3 +1,1 @@
-simple console app that sends strings over UDP. 
-
-will add features as needed
+send strings over UDP user JUCE.

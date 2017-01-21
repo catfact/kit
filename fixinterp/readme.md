@@ -1,1 +1,1 @@
-fixed-point interpolation routinesk
+fixed-point interpolation routines

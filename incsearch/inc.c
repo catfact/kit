@@ -14,10 +14,16 @@ int nres;
 
 char src[NWORDS][STRSIZE];
 char res[NWORDS][STRSIZE];
-	 
+char input[STRSIZE];
+
+void input_init(void) {
+  for(int i=0; i<64; i++) { input[i] = '\0'; }
+}
+
 void search_init(void) {
   for(int i=0; i<NWORDS; i++) {
     strncpy(src[i], dict[i], STRSIZE);
+    res[i][0] = '\0';
   }
   nsrc = NWORDS;
   nres = 0;
@@ -53,16 +59,16 @@ int main(void) {
 
   int ch;
   int pos = 0;
-  char input[64];
-  
-  for(int i=0; i<64; i++) { input[i] = '\0'; }
   
   search_init();
-
+  input_init();
+  
   initscr();
   clear();
   noecho();
   cbreak(); // disable line buffering
+
+  
   
   while(1) {
     
@@ -72,9 +78,19 @@ int main(void) {
       // spacebar: reset
       pos = 0;
       search_init();
+      input_init();
       clear();
-    } else {
 
+      /* } else if(ch == 0x7f) { */
+      /* // FIXME: also need to rebuild search results */
+      /*   // backspace: delete */
+      /*   if(pos > 0) { */
+      /* 	input[--pos] = '\0'; */
+      /* 	mvprintw(0, 0, "%s ", input); */
+      /* 	search_perform((char)ch, pos); */
+      /*   } */
+    } else {
+      
       if(ch == -1 || pos >= 64) { 
 	// no input
 	// buffer is maxed
@@ -83,7 +99,7 @@ int main(void) {
 	// search for input char at current pos
 	input[pos] = (char)ch;
 	mvprintw(0, 0, "%s ", input);
-    
+   
 	search_perform((char)ch, pos);
 	pos++;
 
@@ -91,6 +107,6 @@ int main(void) {
 	
       }    
     }
+    mvprintw(32, 0, "%04x", ch);
   }
-  
 }

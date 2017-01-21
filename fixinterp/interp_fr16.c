@@ -15,7 +15,6 @@ int16_t mul_fr16(int16_t a, int16_t b) {
 }
 
 int16_t mix(int16_t a, int16_t b, int16_t bal) {
-  
   //  printf("mix_a: %04x ; mix_b: %04x ; bal: %04x \r\n", a, b, bal);
   return a + mul_fr16(b-a, bal);
 }
