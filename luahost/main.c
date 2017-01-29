@@ -33,5 +33,5 @@ int main(int argc, char** argv) {
 		printf("%s\n", l_get_stack_buf());
 	  }
   }
-  
+  free(line);
 }
