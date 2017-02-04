@@ -37,20 +37,21 @@ void l_run_code(const char* code) {
   //  sprintf(code_buf, "return ");
   //  strncat(code_buf, code, LUA_CODE_BUF_SIZE - strlen("return "));
 
-  /*
+  
   luaL_loadstring(lua, code); // compile code, push to stack
   lua_pcall(lua, 0, LUA_MULTRET, 0); // pop stack and evaluate
-  */
+  
 
   // 
-  snprintf(code_buf, CODE_BUF_SIZE, "function exec_tmp() return %s end", code);
+  //  snprintf(code_buf, CODE_BUF_SIZE, "function exec_tmp() return %s end", code);
+  /*
   printf("%s\r\n",code_buf);
-  luaL_loadstring(lua, code);
+  luaL_loadstring(lua, code_buf);
   lua_setglobal(lua, "exec_tmp");
   lua_pcall(lua, 0, 0, 0);
   lua_getglobal(lua, "exec_tmp");
   lua_pcall(lua, 0, LUA_MULTRET, 0);
-  
+  */
   //// woff??
   char* p = ret_buf;
   int l = RETURN_BUF_SIZE - 1;
@@ -58,7 +59,7 @@ void l_run_code(const char* code) {
 
   int z = lua_gettop(lua);
   
-  printf("lua call finished with %d items on stack \r\n", z);
+  //  printf("lua call finished with %d items on stack \r\n", z);
 	for(int i=0; i<z; i++) {
 	  n = snprintf(p, l, "%s", lua_tostring(lua, i));
 	l -= n;
@@ -67,7 +68,6 @@ void l_run_code(const char* code) {
   *p='\0';
   
 }
-
 
 /* const char* l_print_stack(void) { */
 /*   char* p = ret_buf; */

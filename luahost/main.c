@@ -1,37 +1,57 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+
+#include <pthread.h>
 
 #include "glue.h"
 
 
-int main(int argc, char** argv) {
-
-  char *line = NULL;
-  size_t len = 0;
-  ssize_t read;
-
+void* repl_run(void* p) {
+  
   l_init();
 
+  size_t len, dum;
+  char* rxbuf;
   int quit = 0;
-  while ( !quit) {
-	printf("> ");
-	read = getline(&line, &len, stdin);
-	//	printf("got line: \"%s\"\n(length %d)\n", line, strlen(line));
-	// zap the newline..
-	line[strlen(line)-1] = '\0';
-	if( (strcmp(line,"quit") == 0)
-		|| (strcmp(line,"exit") == 0)
-		|| (strcmp(line,"q") == 0)
-		|| (strcmp(line,"bye") == 0)
-		) {
-	  quit = 1;
-	  printf("bye \r\n\r\n");
-	}
-	else {
-		l_run_code(line);
-		printf("%s\n", l_get_stack_buf());
+  
+  printf("repl says hello \n");
+  
+  while(!quit) {
+	printf("\n ... "); fflush(stdout);
+	getline(&rxbuf, &dum, stdin);
+	len = strlen(rxbuf);
+	if(len == 2) {
+	  if(rxbuf[0] == 'q') { 
+		quit = 1;
 	  }
+	}
+	else if (len > 0) {
+	  l_run_code(rxbuf);
+	}
   }
-  free(line);
+  printf("repl says bye \r\n");
+  free(rxbuf);
+  
+}
+
+
+
+int main(int argc, char** argv) {
+  int s;
+  pthread_attr_t attr;
+  pthread_t pid;
+  void* res;
+  
+  s = pthread_attr_init(&attr);
+  if (s != 0) { printf("error: %d\n", s);  }
+
+  printf("creating the repl thread... \n");
+  s = pthread_create(&pid, &attr, &repl_run, NULL);
+  if (s != 0) { printf("error: %d\n", s);  }
+  
+  pthread_join(pid, NULL);
+ 
+  return 0;
 }
