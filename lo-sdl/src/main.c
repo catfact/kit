@@ -13,6 +13,12 @@ void error_handler(int num, const char *m, const char *path) {
   fflush(stdout);
 }
 
+void handle_tx_error(void) {
+  printf("OSC error %d: %s\n",
+		 lo_address_errno(remote_addr),
+		 lo_address_errstr(remote_addr) );
+}
+
 void init_sdl(void) {
     SDL_InitSubSystem(SDL_INIT_EVENTS);
 	SDL_InitSubSystem(SDL_INIT_JOYSTICK);
@@ -43,10 +49,12 @@ void handle_sdl_event(SDL_Event* e) {
 			e->jhat.which, e->jhat.hat, e->jhat.value);
 	break;
   case SDL_JOYBUTTONDOWN:
+	printf("button down \n");
 	lo_send(remote_addr, "/joystick/button/down", "iii",
 			e->jbutton.which, e->jbutton.button, e->jbutton.state);
 	break;
   case SDL_JOYBUTTONUP:
+	printf("button up \n");
 	lo_send(remote_addr, "/joystick/button/up", "iii",
 			e->jbutton.which, e->jbutton.button, e->jbutton.state);
 	break;
@@ -56,7 +64,6 @@ void handle_sdl_event(SDL_Event* e) {
   case SDL_JOYDEVICEREMOVED:
 	lo_send(remote_addr, "/joystick/device/removed", "i", e->jdevice.which);
 	break;
-
   case SDL_QUIT:
 	quit = 1;
   }
@@ -70,26 +77,28 @@ void event_loop(void) {
 	  handle_sdl_event(&e);
 	}
   }
+  SDL_Quit();
 }
 
 
 int main(int argc, char** argv) {
   char remote_port[32] = "57120";
   char local_port[32] = "8888";
+  
   if(argc > 1) {
 	strncpy(remote_port, argv[1], 32);
   }
-  if(argc > 1) {
+  if(argc > 2) {
 	strncpy(local_port, argv[2], 32);
   }
 
+  printf("remote port: %s\n", remote_port);
   // send a request
-  lo_address remote_addr = lo_address_new(NULL, remote_port);
-
+  remote_addr = lo_address_new(NULL, remote_port);
 
   init_sdl();
+  
   event_loop();
   
-  //lo_server_thread_free(st);
   
 }
