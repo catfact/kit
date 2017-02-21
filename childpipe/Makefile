@@ -1,5 +1,5 @@
 
-all: sockwrap echo
+all: sockwrap echo blah
 
 sockwrap: sockwrap.c
 	gcc sockwrap.c -o sockwrap
@@ -10,6 +10,8 @@ echo: echo.c
 blah: blah.c
 	gcc blah.c -o blah -lpthread
 
-
 clean:
-	rm sockwrap echo
+	rm sockwrap echo blah
+
+dualpipe: dualpipe.c
+	gcc dualpipe.c -o dualpipe -lpthread
