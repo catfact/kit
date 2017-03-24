@@ -20,29 +20,32 @@ void handle_joy_axis(SDL_Event* e) {
 }
 
 int main(int, char**){
-  
+
+#if 0
+  // event handling subsystem is initialized implicitly by INIT_VIDEO
   if (SDL_Init(SDL_INIT_VIDEO) != 0) {
 	logSDLError(std::cout, "SDL_Init()");
 	return 1;
   }
   
   SDL_Quit();
-
   printf("SDL_Init() ok! \r\n");
-	
+#endif
+  
   SDL_Joystick *joy;
   int i;
   
-  // init joysticks
+  SDL_InitSubSystem(SDL_INIT_EVENTS);
   SDL_InitSubSystem(SDL_INIT_JOYSTICK);
 
-  if (SDL_NumJoysticks() > 0 ) { 
+  if (SDL_NumJoysticks() > 0 ) {
+	printf("found js0, opening\r\n");
 	joy = SDL_JoystickOpen(0);
 
 	if (joy) {
 	  printf("js0: %s \r\n", SDL_JoystickNameForIndex(0));
 	} else {
-	  printf("couldn't open Joystick 0\n");
+	  printf("failed to open js0\n");
 	}
   }
 

@@ -33,6 +33,7 @@
 
 //#include "libevdev.h"
 #include "libevdev-1.0/libevdev/libevdev.h"
+//#include <libevdev.h>
 
 static void
 print_abs_bits(struct libevdev *dev, int axis)

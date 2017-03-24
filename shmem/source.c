@@ -43,6 +43,7 @@ int main(int argc, char *argv[]) {
   
   printf("source: do work \r\n");
   int i=0;
+  
   while(i<SHM_SIZE) {
 	shm->buf[i] = i;
 	i = (i + 1) % 0x5555;

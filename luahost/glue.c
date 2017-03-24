@@ -3,7 +3,9 @@
 #include <lualib.h>
 #include <lauxlib.h>
 #include <string.h>
+
 #include "glue.h"
+#include "tabletest.h"
 
 #define RETURN_BUF_SIZE (1024 * 128)
 char ret_buf[RETURN_BUF_SIZE];
@@ -14,9 +16,22 @@ char code_buf[CODE_BUF_SIZE];
 // the interpreter state
 lua_State* lua;
 
+lua_State* l_state(void) { return lua; }
+
 void l_init(void) {
   lua = luaL_newstate();
   luaL_openlibs(lua);
+  lua_pcall(lua, 0, 0, 0);
+
+  // test..
+  luaL_loadstring(lua, "function hellotest() print(\"luavm says hello\") end ");
+  lua_pcall(lua, 0, 0, 0);
+
+
+  printf("stack dump after loading hellotest() definition: \n");
+  l_print_stack_dump();
+  
+  lua_getglobal(lua, "hellotest");
   lua_pcall(lua, 0, 0, 0);
 }
 
@@ -86,7 +101,41 @@ void l_run_code(const char* code) {
 /*   return (const char*)ret_buf; */
 /* } */
 
+void l_print_stack_dump(void)
+{
+    int i;
+    int top = lua_gettop(lua);
+ 
+    printf("total in stack %d\n",top);
+ 
+    for (i = 1; i <= top; i++)
+    {  /* repeat for each level */
+        int t = lua_type(lua, i);
+        switch (t) {
+            case LUA_TSTRING:  /* strings */
+                printf("string: '%s'\n", lua_tostring(lua, i));
+                break;
+            case LUA_TBOOLEAN:  /* booleans */
+                printf("boolean %s\n",lua_toboolean(lua, i) ? "true" : "false");
+                break;
+            case LUA_TNUMBER:  /* numbers */
+                printf("number: %g\n", lua_tonumber(lua, i));
+                break;
+            default:  /* other values */
+                printf("%s\n", lua_typename(lua, t));
+                break;
+        }
+        printf("  ");  /* put a separator */
+    }
+    printf("\n");  /* end the listing */
+}
+
 
 const char* l_get_stack_buf(void) {
   return (const char*)ret_buf;
+}
+
+
+void l_run_table_test(void) {
+  table_test(lua);
 }

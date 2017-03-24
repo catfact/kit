@@ -1,3 +1,4 @@
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -6,6 +7,7 @@
 #include <pthread.h>
 
 #include "glue.h"
+#include "tabletest.h"
 
 
 void* repl_run(void* p) {
@@ -17,9 +19,11 @@ void* repl_run(void* p) {
   int quit = 0;
   
   printf("repl says hello \n");
+
+  l_run_table_test();
   
   while(!quit) {
-	printf("\n ... "); fflush(stdout);
+	printf("\n > ");
 	getline(&rxbuf, &dum, stdin);
 	len = strlen(rxbuf);
 	if(len == 2) {
@@ -32,7 +36,8 @@ void* repl_run(void* p) {
 	}
   }
   printf("repl says bye \r\n");
-  free(rxbuf);
+  // hm... 
+  //  free(rxbuf);
   
 }
 

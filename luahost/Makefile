@@ -1,5 +1,6 @@
-luahost: main.c glue.c
-	gcc main.c glue.c -o luahost -llua -lpthread
+src = main.c glue.c tabletest.c
+luahost: $(src)
+	gcc $(src) -o luahost -llua -lpthread
 
 clean:
 	rm luahost

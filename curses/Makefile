@@ -1,4 +1,13 @@
-all: basic
+all: padscroll
+
+pad: pad.c
+	gcc pad.c -g -o pad -lncurses
+
+padscroll: padscroll.c
+	gcc padscroll.c -g -o padscroll -lncurses
+
+scroll: scroll.c
+	gcc scroll.c -g -o scroll -lncurses
 
 basic: basic.c
 	gcc basic.c -g -o basic -lncurses

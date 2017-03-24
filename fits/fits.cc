@@ -1,7 +1,7 @@
 /*
   fits.cc
 
-  some points-fitting and interpolation testing  
+  points-fitting and interpolation testing stuff
 */
 
 #include "opencv2/imgproc.hpp"
@@ -11,10 +11,10 @@
 #include <iostream>
 
 #include "fitstate.h"
+#include "helpers.h"
 
 using namespace cv;
 using namespace std;
-
 
 //---- types and classes
 class UI {
@@ -39,23 +39,22 @@ Mat tmp;
 const int w = 800;
 const int h = 300;
 
-UI ui;
-
+UI ui;  
+FitState f;
+  
 //--- static fns
 void handle_mouse_in (int event, int x, int y, int, void* );
 void handle_mouse_out (int event, int x, int y, int, void* );
 void handle_mouse_show (int event, int x, int y, int, void* );
 
 void draw_in(void);
+void draw_out(void);
 
 
 //--- main function
 int main( int, char** argv )
 {
   int k;
-  
-  FitState f;
-  
   in = Mat::zeros(h, w, CV_8UC3);
   out = Mat::zeros(h, w, CV_8UC3);
   show = Mat::zeros(h, w, CV_8UC3);
@@ -76,6 +75,20 @@ int main( int, char** argv )
 	switch(k) {
 	case 113 : // q
 	  quit = true;
+	  break;
+	case 97: // a
+	  switch(ui.mwin) {
+	  case UI::WIN_IN:
+		f.addInput(ui.mx);
+		draw_in();
+		break;
+	  case UI::WIN_OUT:
+		f.addOutput(ui.mx);
+		draw_out();
+		break;
+
+	  }
+	  break;
 	}
   }
   
@@ -89,12 +102,33 @@ void handle_mouse_in (int event, int x, int y, int, void* ) {
 }
 
 void handle_mouse_out (int event, int x, int y, int, void* ) {
-    printf("mouse_out: %d; (%d, %d) \n", event, x, y);
+  printf("mouse_out: %d; (%d, %d) \n", event, x, y);
+  ui.mouse(x, y, UI::WIN_OUT, event > 0);
+  draw_out();
 }
 
 void handle_mouse_show (int event, int x, int y, int, void* ) {
   printf("mouse_show: %d; (%d, %d) \n", event, x, y);
+  ui.mouse(x, y, UI::WIN_SHOW, event > 0);
 }
 
 void draw_in(void) {
+  in.setTo(0);
+  if(ui.mwin == UI::WIN_IN) {
+	line(in, Point(ui.mx, h), Point(ui.mx, 0), Scalar(100, 100, 100));
+	line(in, Point(0, ui.my), Point(w, ui.my), Scalar(100, 100, 100));
+  }
+  tmp.setTo(0);
+  image_overlay(tmp, in, 0.5);
+  imshow("in", in);
+}
+
+
+void draw_out(void) {
+  out.setTo(0);
+  if(ui.mwin == UI::WIN_OUT) {
+	line(out, Point(ui.mx, h), Point(ui.mx, 0), Scalar(100, 100, 100));
+	line(out, Point(0, ui.my), Point(w, ui.my), Scalar(100, 100, 100));
+  }
+  imshow("out", out);
 }
