@@ -79,6 +79,8 @@ int main(int argc, char **argv) {
 
   if(pad_rows == 0) { pad_rows = rows; }
   pad = newpad (pad_rows, cols);
+  // hm...
+  scrollok(pad, TRUE);
   
   if(pad == NULL) {
 	perror("pad allocation");
@@ -90,24 +92,6 @@ int main(int argc, char **argv) {
 
   text_init();
 
-  while((ch = wgetch(pad)) != 'q') {
-    switch(ch) {
-	case 'i':
-	  wprintw(pad, "%s\n\n", text_get_line());
-	  pad_refresh();
-	  break;	  
-	case 'p':
-	  dec_pad_cur_line();
-	  pad_refresh();
-	  break;
-	case 'n':
-	  inc_pad_cur_line();
-	  pad_refresh();
-	  break;
-	}
-  }
-  
-  delwin(pad);
   clear();
   refresh();
 

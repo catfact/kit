@@ -1,4 +1,7 @@
-all: padscroll
+all: pages
+
+pages: pages.c page.c
+	gcc pages.c page.c -g -Wall -Wextra -o pages -lncurses -lpanel
 
 pad: pad.c
 	gcc pad.c -g -o pad -lncurses
