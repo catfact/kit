@@ -32,11 +32,11 @@ void quit(void) {
 void page_junk(struct page* p) {
   int off = rand() % (textlen/2);
   int len = rand() % (textlen/4) + 8;
-  char* str = calloc(len, sizeof(char));
-  snprintf(str, len, "%s", text + off);
-  wprintw(p->pad, "%s\n\n", str);
-  page_refresh(p);
-  free(str);
+  char* pstr = text + off;
+  char save = pstr[len];  
+  pstr[len] = '\0';
+  page_print(p, pstr);
+  pstr[len] = save;
   doupdate();
 }
 

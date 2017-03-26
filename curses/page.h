@@ -25,8 +25,8 @@ struct page {
 
 extern struct page* page_init(int rows, int cols, int x, int y, int w, int h);
 extern void page_deinit(struct page* page);
-// append some text to the page
-extern void page_print(struct page* page, const char* txt);
+// append some text to the page; return new line number
+extern int page_print(struct page* page, const char* txt);
 // refresh the page
 extern void page_refresh(struct page* page);
 // scroll to an arbitrary position and render
@@ -36,3 +36,5 @@ extern void page_scroll_up(struct page* page);
 extern void page_scroll_down(struct page* page);
 extern void page_scroll_forward(struct page* page);
 extern void page_scroll_back(struct page* page);
+// scroll to bottom and render; return new line number
+extern int page_scroll_bottom(struct page* page);

@@ -3,6 +3,9 @@
 #include <panel.h>
 #include "page.h"
 
+//---------------------
+//---- static functions
+
 static void set_row(struct page* p, int r) {
   if(r >= p->rows) { r = p->rows - 1; }
   if(r < 0) { r = 0; }
@@ -14,6 +17,10 @@ static void set_col(struct page* p, int c) {
   if(c < 0) { c = 0; }
   p->col = c;
 }
+
+
+//---------------------
+//---- extern functions
 
 struct page* page_init(int rows, int cols, int x, int y, int w, int h) {
   struct page* p = calloc(1, sizeof(struct page));
@@ -36,8 +43,9 @@ void page_deinit(struct page* p) {
   free(p);
 }
 
-void page_append(struct page* p, const char* txt) {
+int page_print(struct page* p, const char* txt) {
   wprintw(p->pad, txt);
+  return page_scroll_bottom(p);
 }
 
 void page_refresh(struct page* p) {
@@ -68,4 +76,14 @@ void page_scroll_forward(struct page* p) {
 void page_scroll_back(struct page* p) {
   set_col(p, p->col - 1);
   page_refresh(p);
+}
+
+int page_scroll_bottom(struct page* p) {
+  int x, y;
+  getyx(p->pad, y, x);  
+  (void)x;
+  set_row(p, y - p->h + 2);
+  
+  page_refresh(p);
+  return y;
 }
