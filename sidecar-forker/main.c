@@ -11,13 +11,12 @@ const size_t CMD_LINE_BYTES = 1024;
 const char *url = "ipc:///tmp/test.ipc";
 
 // allocates and returns a string buffer
-char *sidecar_run_cmd(const char *cmd, size_t *sz) {
+int sidecar_run_cmd(char **result, const char *cmd, size_t *sz) {
   const size_t CMD_LINE_CHARS = CMD_LINE_BYTES / sizeof(char);
-
   FILE *f = popen((char *)cmd, "r");
   if (f == NULL) {
     fprintf(stderr, "popen() failed\n");
-    return NULL;
+    return -1;
   }
   char *buf = (char *)malloc(CMD_CAPTURE_BYTES);
   buf[0] = '\0';
@@ -25,8 +24,9 @@ char *sidecar_run_cmd(const char *cmd, size_t *sz) {
   printf("captured %d bytes\n", nb);
   buf[nb] = '\0';
   buf = realloc(buf, nb);
+  *result = buf;
   *sz = nb;
-  return buf;
+  return 0;
 }
 
 int run_sidecar() {
@@ -53,7 +53,8 @@ int run_sidecar() {
     size_t sz;
     printf("sidecar received %d bytes\n", nb);
     printf("running cmd: %s\n", buf);
-    char *result = sidecar_run_cmd(buf, &sz);
+    char *result;
+    sidecar_run_cmd(&result, buf, &sz);
     nn_send(fd, result, sz, 0);
     free(result);
     nn_freemsg(buf);
