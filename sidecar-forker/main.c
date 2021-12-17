@@ -20,7 +20,7 @@ int sidecar_run_cmd(char **result, const char *cmd, size_t *sz) {
   }
   char *buf = (char *)malloc(CMD_CAPTURE_BYTES);
   buf[0] = '\0';
-  size_t nb = fread(buf, 1, CMD_CAPTURE_BYTES-1, f);
+  size_t nb = fread(buf, 1, CMD_CAPTURE_BYTES - 1, f);
   printf("captured %d bytes\n", nb);
   buf[nb] = '\0';
   buf = realloc(buf, nb);
@@ -44,20 +44,26 @@ int run_sidecar() {
 
   int nb;
   for (;;) {
-    char *buf = NULL;
-    nb = nn_recv(fd, &buf, NN_MSG, 0);
+    char *cmd = NULL;
+    nb = nn_recv(fd, &cmd, NN_MSG, 0);
     if (nb < 0) {
       fprintf(stderr, "nn_recv: %s\n", nn_strerror(nn_errno()));
       return -1;
     }
+    if (nb < 1) {
+      fprintf(stderr, "empty command\n");
+      return -1;
+    }
     size_t sz;
     printf("sidecar received %d bytes\n", nb);
-    printf("running cmd: %s\n", buf);
+    printf("running cmd: %s\n", cmd);
     char *result;
-    sidecar_run_cmd(&result, buf, &sz);
-    nn_send(fd, result, sz, 0);
-    free(result);
-    nn_freemsg(buf);
+    sidecar_run_cmd(&result, cmd, &sz);
+    if (sz > 0) { 
+        nn_send(fd, result, sz, 0); 
+        free(result);
+    }
+    nn_freemsg(cmd);
   }
   return 0;
 }
@@ -89,13 +95,22 @@ int run_main() {
       fprintf(stderr, "nn_send (main): %s\n", nn_strerror(nn_errno()));
       return -1;
     }
+    fprintf(stderr, "freeing input line memory...");
     free(line);
+    fprintf(stderr, "done. \n");
+    
+    fprintf(stderr, "receiving reply...\n");
     sz = nn_recv(fd, &buf, NN_MSG, 0);
     if (sz < 0) {
       fprintf(stderr, "nn_recv (main): %s\n", nn_strerror(nn_errno()));
       return -1;
     }
-    printf("main rx:\n%s\n", buf);
+    if (sz < 1) {
+      fprintf(stderr, "received empty result\n");
+      return -1;
+    }
+    
+    printf("main rx; bytes=%d, txt = \n%s\n", sz, buf);
     nn_freemsg(buf);
   }
 }
@@ -111,8 +126,7 @@ int main(int argc, char **argv) {
     } else {
       // parent process
       // nothing to do..
-      for (;;)
-        sleep(1);
+      for (;;) sleep(1);
     }
   } else {
     // first fork
