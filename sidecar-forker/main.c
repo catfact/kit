@@ -59,9 +59,9 @@ int run_sidecar() {
     printf("running cmd: %s\n", cmd);
     char *result;
     sidecar_run_cmd(&result, cmd, &sz);
-    if (sz > 0) { 
-        nn_send(fd, result, sz, 0); 
-        free(result);
+    if (sz > 0) {
+      nn_send(fd, result, sz, 0);
+      free(result);
     }
     nn_freemsg(cmd);
   }
@@ -69,10 +69,11 @@ int run_sidecar() {
 }
 
 int run_main() {
-  char *line;
+  char *line = NULL;
   char *buf;
   size_t len;
   size_t sz;
+  int retval = 1;
 
   int fd = nn_socket(AF_SP, NN_REQ);
   if (fd < 0) {
@@ -93,26 +94,37 @@ int run_main() {
     sz = nn_send(fd, line, len, 0);
     if (sz < 0) {
       fprintf(stderr, "nn_send (main): %s\n", nn_strerror(nn_errno()));
-      return -1;
+      retval = -1;
+      break;
     }
-    fprintf(stderr, "freeing input line memory...");
-    free(line);
-    fprintf(stderr, "done. \n");
-    
+    if (sz > 0) {
+      fprintf(stderr, "freeing input line memory...");
+      fprintf(stderr, "done. \n");
+    } else {
+      printf("received empty line input; continuing\n");
+      continue;
+    }
+
     fprintf(stderr, "receiving reply...\n");
     sz = nn_recv(fd, &buf, NN_MSG, 0);
     if (sz < 0) {
       fprintf(stderr, "nn_recv (main): %s\n", nn_strerror(nn_errno()));
-      return -1;
+      retval = -1;
+      break;
     }
-    if (sz < 1) {
+    if (sz > 0) {
+      printf("main rx; bytes=%d, txt = \n%s\n", sz, buf);
+      nn_freemsg(buf);
+    } else {
       fprintf(stderr, "received empty result\n");
-      return -1;
+      retval = -1;
+      break;
     }
-    
-    printf("main rx; bytes=%d, txt = \n%s\n", sz, buf);
-    nn_freemsg(buf);
   }
+  if (line != NULL) {
+    free(line);
+  }
+  return retval;
 }
 
 int main(int argc, char **argv) {
